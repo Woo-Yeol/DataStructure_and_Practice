@@ -1,9 +1,10 @@
 # random module을 import해서 사용한다.
 import random
-
-# Random module의 randrange()함수를 사용하여 0~99의 임의의 숫자를 답으로 입력한다.
-answer = random.randrange(0,100)
 min, max = 0, 99
+# Random module의 randrange()함수를 사용하여 min~max의 임의의 숫자를 답으로 입력한다.
+answer = random.randint(min,max)
+# answer = random.randrange(min, max + 1)
+
 
 # try_n는 1부터 10까지 1씩 증가하며 반복한다.
 for try_n in range(1,10,1) :
