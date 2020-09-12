@@ -1,7 +1,7 @@
 
 def printNum(n):
     if(n != 1) : 
-        printNum(n-1)
+        printNum(n-1) 
     print("%d" % n, end=' ')
 
 def printRevNum(n) :

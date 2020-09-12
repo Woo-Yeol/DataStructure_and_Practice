@@ -1,7 +1,8 @@
 tax = 0;    # 연산을 위한 tax 변수 초기화 및 정의
 income_temp = 0;    # 연산을 위한 income_temp 변수 초기화 및 정의
+
 income = eval(input("소득을 입력하세요 (만원) : "))
-memory_income = income  # 연산을 위한 소득액을 변경하는 변수
+memory_income = income  # 연산을 위한 소득액을 저장하는 변수
 
 if income > 15000 : # 소득이 1억 5000만원 초과일 경우
     income_temp = income - 15000 # 초과되는 금액을 계산하여
