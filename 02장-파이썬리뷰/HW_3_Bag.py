@@ -1,8 +1,8 @@
 # Bag.
 
 class Bag :
-    def __init__(self,bag = []):
-        self.bag = bag
+    def __init__(self):
+        self.bag = []
 
     def contains(self, e) :
         return e in self.bag  # True /False
