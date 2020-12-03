@@ -1,0 +1,125 @@
+# Kruskal의 최소비용 신장 트리 알고리즘을 이용하여 최대 비용 신장 트리를 구하는 프로그램을 구현하라.
+
+parent = []
+set_size = 0
+
+class MinHeap:
+    def __init__ (self) :
+        self.heap =[] #리스트 구조 
+        self.heap.append(0) 
+
+    def __str__ (self) :
+        return str(self.heap)
+
+    def getParent(self, i) :
+        return self.heap[i//2] # 나누기 연산 후 소수점 이하 버리고 정수 부분만 구함
+    def getLeft(self, i) :
+        return self.heap[i*2] # 왼쪽 자식의 인덱스 = (부모의 인덱스) * 2
+    def getRight(self, i) :
+        return self.heap[i*2+1] # 오른쪽 자식의 인덱스 = (부모의 인덱스) * 2 + 1
+    def getSize(self) :
+        return len(self.heap) -1 # -1 cuz we not use the first element 
+    def isEmpty(self) :
+        return self.getSize() == 0 # size is 0
+    
+    def insert(self,n) :
+        self.heap.append(n)
+        i = self.getSize()
+        # i가 루트노드가 아니며, 삽입할 item의 값이 i의 부모 노드 보다 작으면
+        while(i != 1 and n < self.getParent(i)) :
+            self.heap[i] = self.getParent(i) # i번째 노드와 부모 노드를 교환
+            i = i //2 # 한 레벨 위로 올라감
+        self.heap[i] = n # 새로운 노드를 삽입
+
+    def delete(self) :
+        parent = 1
+        child = 2
+        if not self.isEmpty() :
+            hroot = self.heap[1] #루트노드
+            last = self.heap[self.getSize()]
+            while (child <= self.getSize()) :
+                if child < self.getSize() and self.getLeft(parent) > self.getRight(parent) :  # 현재 노드의 자식 노드 중 더 큰 자식 노드를 찾는다.
+                    child +=1
+                if last <= self.heap[child] : # 더 큰 자식 노드보다 마지막 노드가 크면, while문 중지
+                    break
+                # 더 큰 자식 노드보다 마지막 노드가 작으면, 부모 노드와 더 큰 자식 노드를 교환
+                self.heap[parent] = self.heap[child]
+                parent = child # 한 레벨 아래로 이동
+                child *=2
+
+            self.heap[parent] = last # 마지막 노드를 재구성한 위치에 삽입
+            self.heap.pop(-1)
+            return hroot # 최댓값(루트 노드 값)을 반환
+
+    def printHeap(self) :
+        level = 1
+        for i in range(1,self.getSize()+1) :
+            if i == level :
+                print('')
+                level *= 2
+            print(str(self.heap[i]), end = ' ') # 반복문을 통해서 새로운 라인으로 옮겨가며 print한다.
+        print("\n--------------------")
+    
+
+        
+
+# 집합의 초기화 함수
+def init_set(nSets):
+    global set_size, parent     # 전역변수 사용(변경)을 위함
+    set_size = nSets            # 집합의 개수
+    for i in range(nSets):      # 모든 집합에 대해
+        parent.append(-1)       # 각각이 고유의 집합(부모가 -1)
+
+# 정점 id가 속한 집랍의 대표번호 탐색
+def find(id):
+    while(parent[id] >= 0):     # 부모가 있는 동안(-1이 아닌 동안)
+        id = parent[id]         # id를 부모 id로 갱신
+    return id                   # 최종 id 반환, 트리의 맨 위 노드의 id임
+
+# 두 집합을 병합(s1, s2에 병합시킴)
+def union(s1, s2):              
+    global set_size             # 전역변수 사용(변경)을 위함
+    parent[s1] = s2             # s1을 s2에 병합시킴
+    set_size= set_size - 1      # 집합의 개수가 줄어듬
+
+# Kruskal의 최대 비용 신장 트리 프로그램
+def MSTKruskal(vertex, adj):  # 매개변수 : 정점리스트, 인접행렬
+    vsize = len(vertex)         # 정점의 개수
+    init_set(vsize)             # 정점 집합 초기화
+    eList = []                  # 간선 리스트
+    total = 0                   # 가중치의 합
+
+    for i in range(vsize-1):    # 모든 간선을 리스트에 넣음
+        for j in range(i+1,vsize):
+            if adj[i][j] != None :
+                eList.append((i,j,adj[i][j]))   # 튜플로 저장
+    
+    # 간선 리스트를 가중치의 내림차순으로 정렬: 람다 함수 사용
+    eList.sort(key = lambda e : e[2], reverse = True) 
+
+    edgeAccepted = 0            
+    while(edgeAccepted < vsize - 1): # 정점 수 -1개의 간선
+        e = eList.pop(-1)            # 가장 큰 가중치를 가진 간선
+        uset = find(e[0])            # 두 정점이 속한 집합 번호
+        vset = find(e[1])
+
+        if uset != vset :            # 두 정점이 다른 집합의 원소이면
+            print("간선 추가 : (%s, %s, %d)" % (vertex[e[0]], vertex[e[1]], e[2]))  # 간선추가 출력
+            union(uset,vset)         # 두 집합을 합함
+            edgeAccepted += 1        # 간선이 하나 추가 됨
+            total += e[2]            # 가중치의 합에 가중치 더하기
+    return total                     # 가중치의 합 반환
+
+
+#============================================================================================================
+vertex = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+weight = [[None, 29, None, None, None, 10, None],
+          [29, None, 16, None, None, None, 15],
+          [None, 16, None, 12, None, None, None],
+          [None, None, 12, None, 22, None, 18],
+          [None, None, None, 22, None, 27, 25],
+          [10, None, None, None, 27, None, None],
+          [None, 15, None, 18, 25, None, None]
+]
+print("MST By Kruskal's Algorithm")
+print("MST 가중치의 합 = ",MSTKruskal(vertex, weight))
